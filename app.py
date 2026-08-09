@@ -50,12 +50,28 @@ with header_right:
 
 # --- Map ------------------------------------------------------------------
 
+# The view is owned here rather than by the mouse: toggling a country rebuilds the
+# figure, and Streamlit reseeds the chart from it, so mouse pan/zoom would be lost.
+# Re-supplying the view on every rebuild makes it stick.
+view = st.segmented_control(
+    "Zoom to",
+    options=list(worldmap.VIEWS),
+    default=worldmap.DEFAULT_VIEW,
+    key="map_view",
+    label_visibility="collapsed",
+)
+
 event = st.plotly_chart(
-    worldmap.build(visited, theme),
+    worldmap.build(visited, theme, view or worldmap.DEFAULT_VIEW),
     key="world_map",
     on_select="rerun",
     selection_mode="points",
-    config={"displayModeBar": False, "scrollZoom": True},
+    config={
+        "displayModeBar": True,
+        "displaylogo": False,
+        "scrollZoom": True,
+        "modeBarButtonsToRemove": ["select2d", "lasso2d", "toImage"],
+    },
 )
 
 # Plotly keeps the selection in widget state across reruns, so compare against the
@@ -69,7 +85,10 @@ if selection != st.session_state.last_map_selection:
         storage.save(visited, DATA_PATH)
         st.rerun()
 
-st.caption("Click a country to toggle it. Tiny countries are easier to hit in the lists below.")
+st.caption(
+    "Click a country to toggle it, or drag a box to zoom in. Use the buttons above to "
+    "jump to a region - mouse zoom resets when you toggle a country, region zoom does not."
+)
 
 # --- Search + region chips ------------------------------------------------
 

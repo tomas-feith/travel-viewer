@@ -42,16 +42,43 @@ def test_figure_uses_iso3_locations() -> None:
 
 def test_figure_customdata_carries_alpha2() -> None:
     trace = worldmap.build(set()).data[0]
-    assert tuple(trace.customdata) == worldmap.TRACE_ORDER
+    assert tuple(row[0] for row in trace.customdata) == worldmap.TRACE_ORDER
 
 
-def test_uirevision_is_stable_across_rebuilds() -> None:
-    """Pan/zoom survives a toggle only if uirevision does not change with state."""
-    before = worldmap.build(set())
-    after = worldmap.build({"PT", "JP"}, "dark")
-    assert before.layout.geo.uirevision == after.layout.geo.uirevision
-    assert before.layout.uirevision == after.layout.uirevision
-    assert after.layout.geo.uirevision is not None
+def test_hover_reports_visited_state() -> None:
+    trace = worldmap.build({"PT"}).data[0]
+    by_code = {row[0]: row for row in trace.customdata}
+    assert by_code["PT"][2] == "Visited"
+    assert by_code["ES"][2] == "Not visited"
+    assert by_code["PT"][1] == "Europe"
+
+
+def test_default_view_exists_and_is_the_world() -> None:
+    assert worldmap.DEFAULT_VIEW in worldmap.VIEWS
+    assert worldmap.VIEWS[worldmap.DEFAULT_VIEW]["scope"] == "world"
+
+
+@pytest.mark.parametrize("view", list(worldmap.VIEWS))
+def test_every_view_builds_and_is_reapplied(view: str) -> None:
+    """The view must survive a rebuild, which is what makes zoom stick."""
+    fig = worldmap.build({"PT"}, "light", view)
+    assert fig.layout.geo.scope == worldmap.VIEWS[view]["scope"]
+
+
+def test_view_is_independent_of_visited_state() -> None:
+    before = worldmap.build(set(), "light", "Europe")
+    after = worldmap.build({"PT", "JP"}, "light", "Europe")
+    assert before.layout.geo.scope == after.layout.geo.scope == "europe"
+
+
+def test_unknown_view_falls_back_to_world() -> None:
+    fig = worldmap.build(set(), "light", "Atlantis")
+    assert fig.layout.geo.scope == "world"
+
+
+def test_dragmode_is_box_zoom_so_streamlit_does_not_force_pan() -> None:
+    # Streamlit only forces dragmode="pan" when the figure leaves it unset.
+    assert worldmap.build(set()).layout.dragmode == "zoom"
 
 
 @pytest.mark.parametrize("theme", ["light", "dark"])
