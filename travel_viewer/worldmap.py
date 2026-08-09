@@ -16,6 +16,10 @@ from travel_viewer.countries import COUNTRIES
 # Index -> alpha-2, matching the order points are added to the trace below.
 TRACE_ORDER: tuple[str, ...] = tuple(c.alpha2 for c in COUNTRIES)
 
+# Constant across rebuilds so Plotly preserves the user's pan/zoom. It must not
+# encode visited state or theme, or the map would reset whenever those change.
+UI_REVISION = "world-map"
+
 
 class Palette(NamedTuple):
     """Map colors for one theme."""
@@ -72,12 +76,17 @@ def build(visited: set[str], theme: str = "light") -> go.Figure:
         oceancolor=colors.ocean,
         lataxis_range=[-58, 85],
         bgcolor="rgba(0,0,0,0)",
+        # Every toggle rebuilds the figure. Without a stable uirevision, Plotly
+        # treats each rebuild as a new figure and resets pan/zoom to the default
+        # framing above, so the map would snap back on every click.
+        uirevision=UI_REVISION,
     )
     fig.update_layout(
         margin={"l": 0, "r": 0, "t": 0, "b": 0},
         height=520,
         paper_bgcolor="rgba(0,0,0,0)",
         clickmode="event+select",
+        uirevision=UI_REVISION,
     )
     return fig
 

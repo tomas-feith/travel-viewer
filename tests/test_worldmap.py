@@ -45,6 +45,15 @@ def test_figure_customdata_carries_alpha2() -> None:
     assert tuple(trace.customdata) == worldmap.TRACE_ORDER
 
 
+def test_uirevision_is_stable_across_rebuilds() -> None:
+    """Pan/zoom survives a toggle only if uirevision does not change with state."""
+    before = worldmap.build(set())
+    after = worldmap.build({"PT", "JP"}, "dark")
+    assert before.layout.geo.uirevision == after.layout.geo.uirevision
+    assert before.layout.uirevision == after.layout.uirevision
+    assert after.layout.geo.uirevision is not None
+
+
 @pytest.mark.parametrize("theme", ["light", "dark"])
 def test_themes_produce_distinct_visited_colors(theme: str) -> None:
     palette = worldmap.palette_for(theme)
