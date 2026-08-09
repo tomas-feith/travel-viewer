@@ -6,6 +6,8 @@ the map, the counters and the per-region lists all stay in sync.
 - **195 sovereign states** (193 UN members + Vatican City + Palestine)
 - **Click the map** to toggle, or use the per-region chip lists for small countries
   that are hard to hit (Singapore, Malta, Liechtenstein...)
+- **Region buttons** above the map jump the view to a continent; box-drag or the
+  modebar zoom in further
 - **Search** by name or ISO code to filter the lists
 - **Plain JSON storage** in `visited.json` - hand-editable, diffable, yours
 
@@ -73,8 +75,20 @@ To regenerate the country table (only needed if the sovereign-state list changes
 uv run --with pycountry --with pycountry-convert python scripts/gen_countries.py
 ```
 
-## Known rough edge
+## Known rough edges
 
-Plotly keeps a clicked country selected. Clicking the *same* country again first
-clears that selection, so un-toggling from the map takes two clicks. The chip lists
-toggle cleanly in one click either way.
+**Un-toggling from the map takes two clicks.** Plotly keeps a clicked country
+selected; clicking the same country again clears that selection first. The chip
+lists toggle cleanly in one click either way.
+
+**Free mouse zoom resets when you toggle a country.** Toggling reruns the script
+and hands Streamlit a rebuilt figure, and Streamlit reseeds the chart's React state
+from it - `uirevision` does not survive that, and Streamlit exposes no relayout
+event, so Python cannot read the current zoom back either. The region buttons exist
+for this reason: that view lives in Python and is re-supplied on every rebuild, so
+it survives toggling. Use the buttons for a zoom you want to keep, box-drag for a
+quick look.
+
+**No images in tooltips.** Plotly hover labels render only a small HTML subset and
+strip `<img>`, and `st.plotly_chart` reports click/selection events but never hover.
+A picture-per-country would need a click-driven side panel, not a tooltip.
