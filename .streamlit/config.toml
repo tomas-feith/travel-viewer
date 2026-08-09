@@ -1,0 +1,7 @@
+[theme]
+# Matches the "visited" fill in travel_viewer/worldmap.py so the progress bar and
+# selected chips read as the same state as the map.
+primaryColor = "#0f766e"
+
+[browser]
+gatherUsageStats = false

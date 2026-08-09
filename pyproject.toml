@@ -1,0 +1,57 @@
+[project]
+name = "travel-viewer"
+version = "0.1.0"
+description = "A one-page map of the countries you have visited"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "plotly>=6.9.0",
+    "streamlit>=1.61.1",
+]
+
+[dependency-groups]
+dev = [
+    "mypy>=2.3.0",
+    "pre-commit>=4.6.1",
+    "pytest>=9.1.1",
+    "ruff>=0.16.2",
+]
+
+[build-system]
+requires = ["uv_build>=0.9.9,<0.10.0"]
+build-backend = "uv_build"
+
+[tool.uv.build-backend]
+module-name = "travel_viewer"
+module-root = ""
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM", "RUF"]
+
+[tool.ruff.lint.per-file-ignores]
+# The generated country table is one long literal.
+"travel_viewer/countries.py" = ["E501"]
+# The sovereign-state list is kept as a readable whitespace block, not a list literal.
+"scripts/gen_countries.py" = ["SIM905"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+files = ["app.py", "travel_viewer", "tests", "scripts"]
+
+[[tool.mypy.overrides]]
+module = ["plotly.*", "pycountry.*", "pycountry_convert.*"]
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+# Dev-only generator; not worth annotating against untyped third-party libs.
+module = "gen_countries"
+disallow_untyped_calls = false
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"

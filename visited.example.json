@@ -1,0 +1,14 @@
+{
+  "version": 1,
+  "countries": {
+    "ES": {
+      "visited": true
+    },
+    "JP": {
+      "visited": true
+    },
+    "PT": {
+      "visited": true
+    }
+  }
+}
