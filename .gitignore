@@ -1,6 +1,7 @@
 # Your travel history - personal data, deliberately not tracked.
 visited.json
-visited.json.*.tmp
+# mkstemp appends random chars directly to the prefix: visited.jsonAb3xY.tmp
+visited.json*.tmp
 
 # Python
 __pycache__/
