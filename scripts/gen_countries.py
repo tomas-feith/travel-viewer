@@ -5,6 +5,7 @@ app itself has no dependency on either. Re-run only if the sovereign-state list 
 """
 
 import subprocess
+import sys
 from pathlib import Path
 
 import pycountry
@@ -119,7 +120,9 @@ def main() -> None:
     out.write_text(text, encoding="utf-8", newline="\n")
 
     # Emit canonical formatting so the generated file passes `ruff format --check`.
-    subprocess.run(["ruff", "format", "--quiet", str(out)], check=True)
+    # Go through the running interpreter rather than a bare `ruff` on PATH, so this
+    # uses the pinned dev-group ruff even when the script is run outside `uv run`.
+    subprocess.run([sys.executable, "-m", "ruff", "format", "--quiet", str(out)], check=True)
 
     counts: dict[str, int] = {}
     for _, _, _, region in rows:

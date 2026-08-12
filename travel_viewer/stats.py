@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import NamedTuple
 
-from travel_viewer.countries import COUNTRIES, REGIONS, Country
+from travel_viewer.countries import BY_ALPHA2, COUNTRIES, REGIONS, Country
 
 
 class Progress(NamedTuple):
@@ -25,8 +25,8 @@ class Progress(NamedTuple):
 
 
 def overall(visited: set[str]) -> Progress:
-    """Progress across all 195 sovereign states."""
-    return Progress(len(visited & {c.alpha2 for c in COUNTRIES}), len(COUNTRIES))
+    """Progress across all 195 sovereign states, ignoring any unknown codes."""
+    return Progress(len(visited & BY_ALPHA2.keys()), len(COUNTRIES))
 
 
 def by_region(visited: set[str]) -> dict[str, Progress]:

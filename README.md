@@ -75,6 +75,10 @@ To regenerate the country table (only needed if the sovereign-state list changes
 uv run --with pycountry --with pycountry-convert python scripts/gen_countries.py
 ```
 
+The generator is deterministic and formats its own output, so re-running it on an
+unchanged list leaves `travel_viewer/countries.py` byte-identical - a non-empty
+`git diff` after running it means the source list actually changed.
+
 ## Known rough edges
 
 **Un-toggling from the map takes two clicks.** Plotly keeps a clicked country
@@ -92,3 +96,7 @@ quick look.
 **No images in tooltips.** Plotly hover labels render only a small HTML subset and
 strip `<img>`, and `st.plotly_chart` reports click/selection events but never hover.
 A picture-per-country would need a click-driven side panel, not a tooltip.
+
+## License
+
+MIT - see [LICENSE](LICENSE).

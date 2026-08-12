@@ -1,0 +1,28 @@
+version: 2
+
+# Keeps CI action pins and Python deps from silently rotting.
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    commit-message:
+      prefix: ci
+    groups:
+      actions:
+        patterns:
+          - "*"
+
+  - package-ecosystem: uv
+    directory: /
+    schedule:
+      interval: weekly
+    commit-message:
+      prefix: deps
+    groups:
+      # Dev tooling batched; runtime deps (streamlit, plotly) stay individual so
+      # a bump that can move the rendered page gets reviewed on its own.
+      dev-tools:
+        dependency-type: development
+        patterns:
+          - "*"
